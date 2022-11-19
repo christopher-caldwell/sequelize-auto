@@ -49,7 +49,7 @@ export class AutoWriter {
       return this.createFile(t);
     });
 
-    const isTypeScript = this.options.lang === 'ts';
+    const isTypeScript = this.options.lang === "ts";
     const assoc = this.createAssociations(isTypeScript);
 
     // get table names without schema
@@ -62,7 +62,8 @@ export class AutoWriter {
     // write the init-models file
     if (!this.options.noInitModels) {
       const initString = this.createInitString(tableNames, assoc, this.options.lang);
-      const initFilePath = path.join(this.options.directory, "init-models" + (isTypeScript ? '.ts' : '.js'));
+      const initFileName = recase(this.options.caseFile, "init-models");
+      const initFilePath = path.join(this.options.directory, initFileName + (isTypeScript ? '.ts' : '.js'));
       const writeFile = util.promisify(fs.writeFile);
       const initPromise = writeFile(path.resolve(initFilePath), initString);
       promises.push(initPromise);
