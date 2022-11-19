@@ -5,6 +5,7 @@ import { sqliteOptions } from "./sqlite";
 import { DialectOptions } from "./dialect-options";
 import { Dialect } from "sequelize";
 
+//@ts-expect-error Not all dialects are present
 export const dialects: { [name in Dialect]: DialectOptions } = {
   mssql: mssqlOptions,
   mysql: mysqlOptions,
