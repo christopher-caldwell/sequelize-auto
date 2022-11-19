@@ -619,8 +619,10 @@ export class AutoGenerator {
           associations.push(`${this.space[2]}/** ${rel.childModel} belongsTo ${rel.parentModel} via ${rel.parentId} */`)
           associations.push(`${this.space[2]}${rel.parentProp}: Sequelize.Association<${rel.childModel}, ${rel.parentModel}>;`)
 
-          str += `${sp}/** ${rel.childModel} belongsTo ${rel.parentModel} via ${rel.parentId} */\n`
-          str += `${sp}declare ${rel.parentProp}: Sequelize.NonAttribute<${rel.parentModel}>;\n`
+          str += `${sp}/** ${rel.childModel} belongsTo ${rel.parentModel} via ${rel.parentId}\n\n`
+          str += `${sp} * @note This is optional since it's only populated when explicitly requested in code\n`
+          str += `${sp} */\n`
+          str += `${sp}declare ${rel.parentProp}?: Sequelize.NonAttribute<${rel.parentModel}>;\n`
 
           str += `${sp}declare get${pparent}: Sequelize.BelongsToGetAssociationMixin<${rel.parentModel}>;\n`;
           str += `${sp}declare set${pparent}: Sequelize.BelongsToSetAssociationMixin<${rel.parentModel}, ${rel.parentModel}Id>;\n`;
@@ -636,8 +638,10 @@ export class AutoGenerator {
             associations.push(`${this.space[2]}/** ${rel.parentModel} hasOne ${rel.childModel} via ${rel.parentId} */`)
             associations.push(`${this.space[2]}${rel.childProp}: Sequelize.Association<${rel.parentModel}, ${rel.childModel}>;`)
 
-            str += `${sp}/** ${rel.parentModel} hasOne ${rel.childModel} via ${rel.parentId} */\n`
-            str += `${sp}declare ${rel.childProp}: Sequelize.NonAttribute<${rel.childModel}>;\n`
+            str += `${sp}/** ${rel.parentModel} hasOne ${rel.childModel} via ${rel.parentId}\n\n`
+            str += `${sp} * @note This is optional since it's only populated when explicitly requested in code\n`
+            str += `${sp}*/\n`
+            str += `${sp}declare ${rel.childProp}?: Sequelize.NonAttribute<${rel.childModel}>;\n`
 
             str += `${sp}declare get${pchild}: Sequelize.HasOneGetAssociationMixin<${rel.childModel}>;\n`;
             str += `${sp}declare set${pchild}: Sequelize.HasOneSetAssociationMixin<${rel.childModel}, ${rel.childModel}Id>;\n`;
@@ -652,9 +656,11 @@ export class AutoGenerator {
             const plur = _.upperFirst(lur);
 
             associations.push(`${this.space[2]}/** ${rel.parentModel} hasMany ${rel.childModel} via ${rel.parentId} */`)
-            associations.push(`${this.space[2]}${lur}: Sequelize.Association<${hasModel}, ${rel.childModel}>;`)
+            associations.push(`${this.space[2]}${lur}?: Sequelize.Association<${hasModel}, ${rel.childModel}>;`)
 
-            str += `${sp}/** ${rel.parentModel} hasMany ${rel.childModel} via ${rel.parentId} */\n`;
+            str += `${sp}/** ${rel.parentModel} hasMany ${rel.childModel} via ${rel.parentId}\n\n`;
+            str += `${sp} * @note This is optional since it's only populated when explicitly requested in code\n`
+            str += `${sp} */\n`
             str += `${sp}declare ${lur}: Sequelize.NonAttribute<${rel.childModel}[]>;\n`;
 
             str += `${sp}declare get${plur}: Sequelize.HasManyGetAssociationsMixin<${hasModel}>;\n`;
@@ -686,8 +692,10 @@ export class AutoGenerator {
           associations.push(`${this.space[2]}/** ${thisModel} belongsToMany ${otherModel} via ${rel.parentId} and ${rel.childId} */`)
           associations.push(`${this.space[2]}${lotherModelPlural}: Sequelize.Association<${thisModel}, ${otherModel}>;`)
 
-          str += `${sp}/** ${thisModel} belongsToMany ${otherModel} via ${rel.parentId} and ${rel.childId} */\n`
-          str += `${sp}declare ${lotherModelPlural}: Sequelize.NonAttribute<${otherModel}[]>;\n`
+          str += `${sp}/** ${thisModel} belongsToMany ${otherModel} via ${rel.parentId} and ${rel.childId}\n\n`
+          str += `${sp} * @note This is optional since it's only populated when explicitly requested in code\n`
+          str += `${sp}*/\n`
+          str += `${sp}declare ${lotherModelPlural}?: Sequelize.NonAttribute<${otherModel}[]>;\n`
 
           str += `${sp}declare get${otherModelPlural}: Sequelize.BelongsToManyGetAssociationsMixin<${otherModel}>;\n`;
           str += `${sp}declare set${otherModelPlural}: Sequelize.BelongsToManySetAssociationsMixin<${otherModel}, ${otherModel}Id>;\n`;
