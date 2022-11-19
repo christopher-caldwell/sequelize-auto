@@ -717,11 +717,13 @@ export class AutoGenerator {
       delete needed[table]; // don't add import for self
     }
 
-    str += `\n`
-    str += `${sp}declare static associations: {\n`
-    str += associations.join('\n')
-    str += '\n'
-    str += `${sp}};\n`
+    if(associations.length) {
+      str += `\n`
+      str += `${sp}declare static associations: {\n`
+      str += associations.join('\n')
+      str += '\n'
+      str += `${sp}};\n`
+    }
 
     return { needed, str };
   }
