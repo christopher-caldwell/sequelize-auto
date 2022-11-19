@@ -151,6 +151,8 @@ export interface AutoOptions {
   indentation?: number;
   /** Model language */
   lang?: LangOption;
+  /** Whether to log the query executed on the source to get the relevant table info */
+  logQuery?: boolean
   /** Whether to avoid creating alias property in relations */
   noAlias?: boolean;
   /** Whether to skip writing index information */

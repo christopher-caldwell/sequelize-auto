@@ -135,6 +135,11 @@ const argv = require('yargs')
     type: 'boolean',
     alias: 'sg'
   })
+  .option('logQuery', {
+    description: 'Whether to log the query executed on the source to get the relevant table info',
+    type: 'boolean',
+    alias: 'lq'
+  })
   .check(argv => Boolean((argv.database && (argv.host || argv.dialect === 'sqlite')) || argv.config))
   .argv;
 
@@ -220,6 +225,7 @@ async function readPassword() {
   configFile.useDefine = argv.useDefine || configFile.useDefine || false;
   configFile.indentation = argv.indentation || configFile.indentation || 2;
   configFile.noIndexes = argv.noIndexes || configFile.noIndexes || false;
+  configFile.logQuery = argv.logQuery || configFile.logQuery || false;
 
   console.log(_.omit(configFile, 'password'));
 

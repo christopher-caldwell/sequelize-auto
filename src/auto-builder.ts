@@ -15,6 +15,7 @@ export class AutoBuilder {
   schema?: string;
   views: boolean;
   tableData: TableData;
+  logQuery: boolean
 
   constructor(sequelize: Sequelize, options: AutoOptions) {
     this.sequelize = sequelize;
@@ -24,6 +25,7 @@ export class AutoBuilder {
     this.skipTables = options.skipTables;
     this.schema = options.schema;
     this.views = !!options.views;
+    this.logQuery = !!options.logQuery
 
     this.tableData = new TableData();
   }
@@ -35,7 +37,7 @@ export class AutoBuilder {
       const showTablesSql = this.dialect.showTablesQuery(this.schema);
       prom = this.executeQuery<string>(showTablesSql);
     } else {
-      prom = this.queryInterface.showAllTables();
+      prom = this.queryInterface.showAllTables({ logging: this.logQuery });
     }
 
     if (this.views) {
@@ -123,7 +125,7 @@ export class AutoBuilder {
 
   private async mapTable(table: Table) {
     try {
-      const fields = await this.queryInterface.describeTable(table.table_name, table.table_schema);
+      const fields = await this.queryInterface.describeTable(table.table_name, { schema: table.table_schema, logging: this.logQuery });
       this.tableData.tables[makeTableQName(table)] = fields;
 
       // for postgres array or user-defined types, get element type
@@ -185,7 +187,7 @@ export class AutoBuilder {
       }
 
       this.tableData.indexes[makeTableQName(table)] = await this.queryInterface.showIndex(
-        { tableName: table.table_name, schema: table.table_schema }) as IndexSpec[];
+        { tableName: table.table_name, schema: table.table_schema }, { logging: this.logQuery }) as IndexSpec[];
 
       // if there is no primaryKey, and `id` field exists, then make id the primaryKey (#480)
       if (!_.some(fields, { primaryKey: true })) {
@@ -209,6 +211,7 @@ export class AutoBuilder {
 
   private executeQuery<T>(query: string): Promise<T[]> {
     return this.sequelize.query(query, {
+      logging: this.logQuery,
       type: QueryTypes.SELECT,
       raw: true
     }) as any as Promise<T[]>;

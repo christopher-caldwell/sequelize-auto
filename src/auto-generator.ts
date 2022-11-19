@@ -45,7 +45,7 @@ export class AutoGenerator {
 
     if (this.options.lang === 'ts') {
       header += "import * as Sequelize from 'sequelize';\n";
-      header += "import { DataTypes, Model, InferAttributes, InferCreationAttributes } from 'sequelize';\n";
+      header += "import { DataTypes, Model, Optional, InferAttributes, InferCreationAttributes } from 'sequelize';\n";
     } else if (this.options.lang === 'es6') {
       header += "const Sequelize = require('sequelize');\n";
       header += "module.exports = (sequelize, DataTypes) => {\n";
@@ -100,12 +100,22 @@ export class AutoGenerator {
         });
         str += '\n'
 
+        // str += "\nexport interface #TABLE#Attributes {\n";
+        // str += this.addTypeScriptFields(table) + "}\n\n";
+
         const primaryKeys = this.getTypeScriptPrimaryKeys(table);
 
         if (primaryKeys.length) {
           str += `export type #TABLE#Pk = ${primaryKeys.map((k) => `"${recase(this.options.caseProp, k)}"`).join(' | ')};\n`;
           str += `export type #TABLE#Id = #TABLE#[#TABLE#Pk];\n\n`;
         }
+
+        // if (creationOptionalFields.length) {
+          // str += `export type #TABLE#OptionalAttributes = ${creationOptionalFields.map((k) => `"${recase(this.options.caseProp, k)}"`).join(' | ')};\n`;
+        //   str += "export type #TABLE#CreationAttributes = Optional<#TABLE#Attributes, #TABLE#OptionalAttributes>;\n\n";
+        // } else {
+        //   str += "export type #TABLE#CreationAttributes = #TABLE#Attributes;\n\n";
+        // }
 
         str += "export class #TABLE# extends Model<InferAttributes<#TABLE#>, InferCreationAttributes<#TABLE#>> {\n";
         str += this.addTypeScriptFields(table);
@@ -709,6 +719,7 @@ export class AutoGenerator {
   }
 
   private addTypeScriptFields(table: string) {
+    const creationOptionalFields = this.getTypeScriptCreationOptionalFields(table);
     const sp = this.space[1];
     const fields = _.keys(this.tables[table]);
     let str = '';
@@ -716,7 +727,8 @@ export class AutoGenerator {
       if (!this.options.skipFields || !this.options.skipFields.includes(field)){
         const name = this.quoteName(recase(this.options.caseProp, field));
         const isOptional = this.getTypeScriptFieldOptional(table, field);
-        str += `${sp}declare ${name}${isOptional ? '?' : ''}: ${this.getTypeScriptType(table, field)};\n`;
+        const isThisFieldCreationOptional = creationOptionalFields.find((creationOptionalField) => creationOptionalField === field)
+        str += `${sp}declare ${name}${isOptional ? '?' : ''}: ${isThisFieldCreationOptional ? 'Sequelize.CreationOptional<' : ''}${this.getTypeScriptType(table, field)}${isThisFieldCreationOptional ? '>' : ''};\n`;
       }
     });
     return str;
